@@ -1,0 +1,11 @@
+stages:
+  train:
+    cmd: python training/train_model.py
+    deps:
+      - training/train_model.py
+      - training/config.py
+      - data/raw/train.csv
+    outs:
+      - models/toxic_comment_model.keras
+      - models/model_config.json
+      - reports/training_report.json

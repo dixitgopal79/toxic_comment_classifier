@@ -1,0 +1,15 @@
+venv/
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.env
+.DS_Store
+.vscode/
+.idea/
+data/raw/*.csv
+data/raw/*.zip
+models/*.keras
+models/*.h5
+reports/*.json
+dvc.lock

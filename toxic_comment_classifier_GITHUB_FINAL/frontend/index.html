@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Toxic Comment Classifier multi-label toxic comment classifier">
+  <title>Toxic Comment Classifier — Toxic Comment Analysis</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <div class="bg-grid"></div>
+  <header class="topbar">
+    <div class="brand"><span class="logo">T</span><div><b>Toxic Comment Classifier</b><small>Toxic Comment Analysis</small></div></div>
+    <nav>
+      <button class="nav-btn active" data-view="analyze">Analyze</button>
+      <button class="nav-btn" data-view="dashboard">Dashboard</button>
+      <button class="nav-btn" data-view="history">History</button>
+      <button class="nav-btn" data-view="about">Architecture</button>
+    </nav>
+    <button id="themeBtn" class="icon-btn" title="Toggle theme">◐</button>
+  </header>
+
+  <main>
+    <section id="analyze" class="view active">
+      <div class="hero">
+        <div>
+          <div class="eyebrow">MULTI-LABEL NLP ENGINE</div>
+          <h1>Understand toxicity<br><span>before it spreads.</span></h1>
+          <p>Analyze a comment across six toxicity dimensions using a trained TensorFlow BiLSTM model.</p>
+        </div>
+        <div class="hero-chip"><span class="pulse"></span><span id="systemStatus">Checking system...</span></div>
+      </div>
+
+      <div class="analyze-grid">
+        <section class="card composer">
+          <div class="card-head"><div><h2>Comment analysis</h2><p>Paste text below and run the classifier.</p></div><span id="charCount">0 / 5000</span></div>
+          <textarea id="comment" maxlength="5000" placeholder="Type or paste a comment here..."></textarea>
+          <div class="examples">
+            <button data-example="Thanks for your help, this was very useful.">Neutral example</button>
+            <button data-example="You are an idiot and nobody wants you here.">Toxic example</button>
+            <button data-example="I disagree with your argument. Please explain your reasoning.">Debate example</button>
+          </div>
+          <button id="analyzeBtn" class="primary"><span id="btnText">Analyze comment</span><span id="spinner" class="spinner hidden"></span></button>
+          <div id="error" class="alert hidden"></div>
+        </section>
+
+        <section class="card result">
+          <div class="card-head"><div><h2>Risk assessment</h2><p>Model output and confidence</p></div><span id="riskBadge" class="badge neutral">WAITING</span></div>
+          <div id="emptyResult" class="empty">Run an analysis to see model output.</div>
+          <div id="resultContent" class="hidden">
+            <div class="score-ring"><div><strong id="mainConfidence">0%</strong><small>max score</small></div></div>
+            <div class="summary-row"><div><span>Overall</span><b id="overallText">—</b></div><div><span>Model</span><b id="modelVersion">—</b></div></div>
+            <div id="labelScores" class="label-list"></div>
+            <div class="feedback"><span>Was this prediction useful?</span><button id="yesBtn">✓ Yes</button><button id="noBtn">✕ No</button></div>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <section id="dashboard" class="view">
+      <div class="page-title"><div><div class="eyebrow">OPERATIONS</div><h1>Safety dashboard</h1><p>Live application-level analytics from stored predictions.</p></div><button id="refreshStats" class="secondary">↻ Refresh</button></div>
+      <div class="metrics">
+        <div class="metric"><span>Total predictions</span><strong id="mTotal">—</strong></div>
+        <div class="metric"><span>Toxic predictions</span><strong id="mToxic">—</strong></div>
+        <div class="metric"><span>Toxic rate</span><strong id="mRate">—</strong></div>
+        <div class="metric"><span>Feedback accuracy</span><strong id="mFeedback">—</strong></div>
+      </div>
+      <div class="card dashboard-card"><div class="card-head"><div><h2>System status</h2><p>Backend, database and model readiness.</p></div></div><div id="systemPanel" class="system-panel"></div></div>
+    </section>
+
+    <section id="history" class="view">
+      <div class="page-title"><div><div class="eyebrow">AUDIT TRAIL</div><h1>Prediction history</h1><p>Recent classifications stored in MongoDB.</p></div><a class="secondary link-btn" href="/api/export">↓ Export CSV</a></div>
+      <div class="toolbar"><input id="historySearch" class="history-search" placeholder="Search comments..."><button class="filter active" data-filter="all">All</button><button class="filter" data-filter="toxic">Toxic only</button><button class="filter" data-filter="safe">Non-toxic</button><button id="refreshHistory" class="secondary">↻ Refresh</button></div>
+      <div class="card table-card"><div id="historyList" class="history-list"><div class="empty">Loading history...</div></div></div>
+    </section>
+
+    <section id="about" class="view">
+      <div class="page-title"><div><div class="eyebrow">ENGINEERING</div><h1>Architecture</h1><p>A clean end-to-end ML application, not just a notebook.</p></div></div>
+      <div class="architecture">
+        <div class="arch-node"><b>Browser</b><small>HTML • CSS • JS</small></div><div class="arrow">→</div>
+        <div class="arch-node"><b>FastAPI</b><small>REST • Validation • Docs</small></div><div class="arrow">→</div>
+        <div class="arch-node"><b>Model Service</b><small>TensorFlow • BiLSTM</small></div><div class="arrow">→</div>
+        <div class="arch-node"><b>MongoDB</b><small>History • Feedback • Analytics</small></div>
+      </div>
+      <div class="feature-grid">
+        <div class="feature"><b>01 · Multi-label NLP</b><p>One comment can receive multiple toxicity labels instead of a single class.</p></div>
+        <div class="feature"><b>02 · Model versioning</b><p>Training writes model metadata and a version identifier used by the API.</p></div>
+        <div class="feature"><b>03 · Observability</b><p>Health, statistics, prediction history and user feedback are exposed through APIs.</p></div>
+        <div class="feature"><b>04 · Data lifecycle</b><p>MongoDB indexes support fast history queries and automatic demo-data retention.</p></div>
+        <div class="feature"><b>05 · Security basics</b><p>Optional API-key protection, rate limiting and security headers are included.</p></div>
+        <div class="feature"><b>06 · Reproducibility</b><p>DVC tracks the training pipeline while the dataset stays outside Git.</p></div>
+<div class="feature"><b>07 · Batch API</b><p>Multiple comments can be sent to the API in one request for bulk analysis.</p></div>
+<div class="feature"><b>08 · Model card</b><p>The repository documents the model input, output, architecture and limitations.</p></div>
+<div class="feature"><b>09 · Safer deployment</b><p>Configuration is kept in environment variables instead of hard-coded secrets.</p></div>
+      </div>
+    </section>
+  </main>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
