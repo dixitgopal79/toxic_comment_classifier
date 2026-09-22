@@ -1,29 +1,72 @@
-# Toxic Comment Classifier
+# Toxic Comment Classification
 
-A web application that checks online comments for six common toxicity categories.
+A multi-label NLP application that detects different types of toxic comments using a deep learning model.
 
-The project includes model training, a REST API, a small web dashboard and MongoDB storage. The same application can be run locally without changing the code structure.
+The project provides a web interface where users can enter a comment and get toxicity predictions through a FastAPI backend.
 
 ## Features
 
-- Six-label toxic comment classification
-- TensorFlow/Keras BiLSTM model
-- Jigsaw training data downloader
+- Detects multiple types of toxic comments
+- Multi-label text classification
+- BiLSTM-based deep learning model
 - FastAPI REST API
-- MongoDB prediction history
-- Prediction feedback
-- CSV export
-- Simple analytics dashboard
-- Dark/light theme
-- API health check
-- Request rate limiting
-- Optional API key
-- Docker setup
-- GitHub Actions test workflow
-- DVC training pipeline
-- Automated model evaluation report
+- HTML, CSS and JavaScript frontend
+- MongoDB for storing prediction history
+- Batch prediction support
+- Prediction history and analytics
+- Feedback collection
+- Docker and Docker Compose support
+- DVC pipeline for ML workflow
+- Pytest tests
+- GitHub Actions CI
 
-## Project structure
+## Toxicity Categories
+
+The model classifies comments into six categories:
+
+- Toxic
+- Severe Toxic
+- Obscene
+- Threat
+- Insult
+- Identity Hate
+
+A single comment can belong to more than one category.
+
+## Tech Stack
+
+### Frontend
+- HTML
+- CSS
+- JavaScript
+
+### Backend
+- Python
+- FastAPI
+- Pydantic
+
+### Machine Learning
+- TensorFlow
+- Keras
+- NLP
+- BiLSTM
+- Multi-label Classification
+- Scikit-learn
+
+### Database
+- MongoDB
+- PyMongo
+
+### Tools
+- Git
+- GitHub
+- Docker
+- Docker Compose
+- DVC
+- Pytest
+- GitHub Actions
+
+## Project Structure
 
 ```text
 toxic_comment_classifier/
@@ -33,8 +76,10 @@ toxic_comment_classifier/
 │   │   └── routes.py
 │   ├── services/
 │   │   ├── database_service.py
+│   │   ├── metrics_service.py
 │   │   ├── model_service.py
-│   │   └── security.py
+│   │   ├── security.py
+│   │   └── text_service.py
 │   ├── config.py
 │   ├── schemas.py
 │   └── main.py
@@ -45,266 +90,34 @@ toxic_comment_classifier/
 │   └── app.js
 │
 ├── training/
-│   ├── config.py
 │   ├── train_model.py
-│   └── evaluate_model.py
+│   ├── evaluate_model.py
+│   ├── data_checks.py
+│   ├── data_report.py
+│   ├── inference_test.py
+│   └── config.py
 │
 ├── scripts/
-│   └── download_jigsaw.py
+│   ├── download_jigsaw.py
+│   ├── api_smoke_test.py
+│   └── batch_predict.py
 │
 ├── tests/
+│   ├── test_api.py
+│   └── test_services.py
+│
 ├── data/
+│   └── raw/
+│
 ├── models/
+│
 ├── reports/
+│
 ├── docs/
+│
 ├── Dockerfile
 ├── docker-compose.yml
 ├── dvc.yaml
 ├── requirements.txt
-└── .env.example
-```
-
-## How it works
-
-```text
-Comment
-   |
-   v
-Web page
-   |
-   v
-FastAPI
-   |
-   +----> Validation
-   |
-   +----> TensorFlow model
-   |          |
-   |          v
-   |     6 probabilities
-   |
-   +----> MongoDB
-              |
-              +-- history
-              +-- feedback
-              +-- statistics
-```
-
-The model predicts:
-
-```text
-toxic
-severe_toxic
-obscene
-threat
-insult
-identity_hate
-```
-
-A comment can belong to more than one category.
-
-## Requirements
-
-- Python 3.11 recommended
-- MongoDB
-- Kaggle account for downloading the competition data
-
-## Setup on Windows
-
-Create the environment:
-
-```powershell
-python -m venv venv
-.\venv\Scripts\Activate.ps1
-```
-
-Install packages:
-
-```powershell
-pip install -r requirements.txt
-```
-
-Copy the environment file:
-
-```powershell
-copy .env.example .env
-```
-
-## Download training data
-
-The downloader uses the official Kaggle competition files.
-
-```powershell
-python scripts/download_jigsaw.py
-```
-
-The Kaggle account must have access to the competition data.
-
-The data is deliberately kept out of Git.
-
-## Train the model
-
-```powershell
-python training/train_model.py
-```
-
-The training script creates:
-
-```text
-models/toxic_comment_model.keras
-models/model_config.json
-reports/training_report.json
-```
-
-To run the separate evaluation:
-
-```powershell
-python training/evaluate_model.py
-```
-
-## Start MongoDB
-
-If MongoDB is installed locally, make sure the MongoDB service is running.
-
-Or use Docker:
-
-```powershell
-docker compose up -d mongodb
-```
-
-## Start the application
-
-```powershell
-uvicorn backend.main:app --reload
-```
-
-Open:
-
-```text
-http://127.0.0.1:8000
-```
-
-The API documentation is available at:
-
-```text
-http://127.0.0.1:8000/docs
-```
-
-FastAPI provides the interactive API documentation automatically.
-
-## API endpoints
-
-| Method | Endpoint | Purpose |
-|---|---|---|
-| GET | `/health` | Application/model/database status |
-| POST | `/api/predict` | Classify a comment |
-| POST | `/api/predict/batch` | Classify up to 20 comments in one request |
-| GET | `/api/history` | View recent predictions |
-| GET | `/api/stats` | View basic application statistics |
-| GET | `/api/model` | View model information |
-| POST | `/api/feedback` | Save prediction feedback |
-| GET | `/api/export` | Download prediction history |
-
-Example:
-
-```json
-POST /api/predict
-
-{
-  "text": "Example comment"
-}
-```
-
-## Docker
-
-Build and start everything:
-
-```powershell
-docker compose up --build
-```
-
-The web application will run on port `8000`.
-
-The model file still needs to be created before starting the application if it is not already present.
-
-## Testing
-
-```powershell
-pytest -q
-```
-
-## DVC
-
-The training process is defined in `dvc.yaml`.
-
-```powershell
-dvc repro
-```
-
-## Configuration
-
-The main settings are in `.env`.
-
-```text
-MONGODB_URL=mongodb://localhost:27017
-MONGODB_DB=toxic_comment_db
-MODEL_PATH=models/toxic_comment_model.keras
-RATE_LIMIT_PER_MINUTE=60
-```
-
-## Notes
-
-The Jigsaw competition data is not included in this repository. It is downloaded using the user's own Kaggle access.
-
-The trained model is also not committed to Git because model files are generated artifacts.
-
-For a resume, describe the technologies that are actually present in this repository. This version uses TensorFlow/Keras, FastAPI, MongoDB, HTML/CSS/JavaScript and DVC.
-
-
-## Useful development commands
-
-Create a dataset report:
-
-```powershell
-python training/data_report.py
-```
-
-Check model inference locally:
-
-```powershell
-python training/inference_test.py
-```
-
-Run a basic API smoke test while the server is running:
-
-```powershell
-python scripts/api_smoke_test.py
-```
-
-Send multiple comments to the batch endpoint:
-
-```powershell
-python scripts/batch_predict.py "This is fine" "Another comment"
-```
-
-The API also exposes:
-
-```text
-GET /api/analytics
-GET /api/analyze-text?text=hello
-GET /api/history/search?q=hello
-POST /api/predict/batch
-```
-
-## Development approach
-
-The project is intentionally split into separate areas:
-
-- `training/` contains model and dataset code.
-- `backend/services/` contains model/database logic.
-- `backend/api/` contains HTTP routes.
-- `frontend/` contains the browser interface.
-- `scripts/` contains local utility commands.
-- `tests/` contains automated tests.
-- `docs/` contains architecture and setup notes.
-
-This keeps the training code independent from the API and UI.
+├── .env.example
+└── README.md
